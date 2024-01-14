@@ -2,6 +2,7 @@ import React from 'react'
 import {getPokemon} from '../api'
 import {Link} from 'react-router-dom'
 import PokeHomeCard from '../components/PokeHomeCard'
+import SearchContainer from '../components/SearchContainer'
 
 
 export default function Page(){
@@ -17,7 +18,7 @@ export default function Page(){
         action==='Next'?setCurrentPage(prevState => prevState+20):setCurrentPage(prevState => prevState - 20)
     }
 
-    //NOTE: Bad practice to just use fetch within the useEffect
+    //NOTE: Probs Bad practice to just use fetch within the useEffect rather than making async functions like the other below
 
     React.useEffect(()=>{
         fetch(`https://pokeapi.co/api/v2/pokemon/?limit=1302`)
@@ -43,7 +44,7 @@ export default function Page(){
         setFilteredSearchData(limitedPokemon)
     }
 
-    const filteredStuff = filteredSearchData.map(item=>{
+    const searchResults = filteredSearchData.map(item=>{
         if(searchValue){
             return(
                 <Link to={`/pokemon/${item.name}`}>
@@ -51,33 +52,20 @@ export default function Page(){
                     {item.name}
                     </div>                
                 </Link>
-
             )
         }
     })
 
     return(
         <div>
-            <div className='search-container'>
-                <button className='searchBtn' onClick={currentPage !==0?(e)=>changePage(e):null}>Previous</button>
-                <button className='searchBtn' onClick={(e)=>changePage(e)}>Next</button>
-                <input 
-                    className='searchBar'
-                    type='text'
-                    onChange={(event) => handleChange(event.target.value)}
-                    placeholder='  Enter Pokemon Name'
-                />
+            <SearchContainer
+                changePage = {changePage}
+                handleChange = {handleChange}
+                currentPage={currentPage}
+                searchValue = {searchValue}
+            />
 
-                <Link to={`/pokemon/${searchValue}`}>
-                    <button className='submitSearchBtn'>
-                        Click
-                    </button>
-                </Link>
-            </div>
-
-            {searchData?<div className='results'>
-                    {filteredStuff}
-            </div>:null}
+            {searchResults.length > 0 && <div className='results' >{searchResults}</div>}
 
             <div className='home-container'>
                 <PokeHomeCard 
